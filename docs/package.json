@@ -1,0 +1,6 @@
+{
+  "name": "@acme/docs",
+  "scripts": {
+    "dev": "mintlify dev --port 4000"
+  }
+}

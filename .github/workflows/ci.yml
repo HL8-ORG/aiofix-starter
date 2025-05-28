@@ -1,57 +1,85 @@
 name: CI
-
+# 触发条件
 on:
+  # 触发条件: 当有任何分支的 pull request 被创建或更新时
   pull_request:
     branches: ["*"]
+  # 触发条件: 当 main 分支有任何提交时
   push:
     branches: ["main"]
+  # 触发条件: 当有任何分支的合并请求被创建或更新时
   merge_group:
-
+# 并发控制
 concurrency:
+  # 组名，同一工作流和分支的多个运行实例会被合并为一个组
   group: ${{ github.workflow }}-${{ github.ref }}
+  # 如果当前运行的不是 main 分支，则取消正在进行的相同组的工作流实例
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
+# 环境变量
 # You can leverage Vercel Remote Caching with Turbo to speed up your builds
 # @link https://turborepo.org/docs/core-concepts/remote-caching#remote-caching-on-vercel-builds
 env:
+  # 强制终端使用 3 位颜色输出
   FORCE_COLOR: 3
+  # TURBO_TEAM 和 TURBO_TOKEN：用于 Turbo 远程缓存的团队和令牌配置，从 GitHub 的变量和密钥中获取。
+  # 团队 ID
   TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+  # 令牌
   TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
 
+# 任务
 jobs:
+  # 任务名称
   lint:
+    # 运行环境
     runs-on: ubuntu-latest
+    # 步骤
     steps:
+      # 使用 GitHub 的官方检查操作
       - uses: actions/checkout@v4
 
+      # 使用自定义的 GitHub 设置操作
       - name: Setup
         uses: ./tooling/github/setup
-
+      # 复制环境变量文件
       - name: Copy env
         shell: bash
         run: cp .env.example .env
 
+      # 运行 lint 命令
       - name: Lint
+        # 运行 lint 和 lint:ws 命令
         run: pnpm lint && pnpm lint:ws
 
+  # 任务名称
   format:
+    # 运行环境
     runs-on: ubuntu-latest
+    # 步骤
     steps:
+      # 使用 GitHub 的官方检查操作
       - uses: actions/checkout@v4
 
+      # 使用自定义的 GitHub 设置操作
       - name: Setup
         uses: ./tooling/github/setup
 
+      # 运行 format 命令
       - name: Format
         run: pnpm format
 
+  # 任务名称
   typecheck:
+    # 运行环境
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
+      # 使用自定义的 GitHub 设置操作
       - name: Setup
         uses: ./tooling/github/setup
 
+      # 运行 typecheck 命令
       - name: Typecheck
         run: pnpm typecheck

@@ -1,17 +1,29 @@
+# GitHub Action 名称
 name: "Setup and install"
-description: "Common setup steps for Actions"
+# GitHub Action 描述
+description: "采取行动的常见设置步骤"
 
+# 运行配置
 runs:
+  # 使用 composite 模式运行
   using: composite
+  # 步骤列表
   steps:
+    # 第一步：设置 pnpm
     - uses: pnpm/action-setup@v4
+    
+    # 第二步：设置 Node.js 环境
     - uses: actions/setup-node@v4
       with:
+        # 从 .nvmrc 文件中读取 Node.js 版本
         node-version-file: ".nvmrc"
+        # 启用 pnpm 缓存
         cache: "pnpm"
 
+    # 第三步：全局安装 turbo 构建工具
     - shell: bash
       run: pnpm add -g turbo
 
+    # 第四步：安装项目依赖
     - shell: bash
       run: pnpm install
